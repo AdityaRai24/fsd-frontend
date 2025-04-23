@@ -45,7 +45,7 @@ const StudentRubricsModal = ({
   const subjectFinalCriteria = subjec.subjectCriteria;
   const subjectFinalCO = subjec.courseOutcomes;
 
-  let downloadAvailable = false;
+    let downloadAvailable = false;
 
   if (student?.allExperimentMarks) {
     downloadAvailable = student.allExperimentMarks.every((experiment) => {

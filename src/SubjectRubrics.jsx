@@ -12,15 +12,20 @@ const SubjectRubrics = () => {
   const userId = JSON.parse(localStorage.getItem("studentData"))._id;
   const [activeView, setActiveView] = useState("preview");
   const [rubricsData, setRubricsData] = useState(null);
+  const [criteriaDetails, setCriteriaDetails] = useState(null);
+  const [CODetails, setCODetails] = useState(null);
 
   useEffect(() => {
     fetchRubricsDetails();
+    fetchRubricsCriterias();
   }, []);
 
   const fetchRubricsDetails = async () => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/api/students/${subjectId}/${userId}`
+        `${
+          import.meta.env.VITE_BACKEND_URL
+        }/api/students/${subjectId}/${userId}`
       );
       const allExpMarks = [];
       response.data.experiments.map((item) => allExpMarks.push(item.marks));
@@ -30,9 +35,21 @@ const SubjectRubrics = () => {
         studentName: response.data.studentName,
         sapId: response.data.sapId,
         subjectName: response.data.subject,
-        subject: response.data.subject
+        subject: response.data.subject,
       };
       setRubricsData(newData);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchRubricsCriterias = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/rubrics/${subjectId}`
+      );
+      setCriteriaDetails(response.data.criteria);
+      setCODetails(response.data.courseOutcomes);
     } catch (error) {
       console.log(error);
     }
@@ -43,16 +60,37 @@ const SubjectRubrics = () => {
       <div className="flex justify-center items-center min-h-screen bg-gray-50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600 font-medium">Loading assessment data...</p>
+          <p className="mt-4 text-gray-600 font-medium">
+            Loading assessment data...
+          </p>
         </div>
       </div>
     );
   }
 
+  const handleDownloadView = () => {
+    let downloadAvailable = false;
+
+    if (rubricsData?.allExperimentMarks) {
+      downloadAvailable = rubricsData?.allExperimentMarks.every((experiment) => {
+        const sum = experiment.reduce((total, mark) => total + mark, 0);
+        return sum > 0;
+      });
+    }
+
+    if (downloadAvailable) {
+      setActiveView("download");
+    } else {
+      toast.error("All Experiments have not been graded yet.");
+    }
+  };
+
+  console.log(rubricsData);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="flex items-center justify-between px-6 py-4 bg-white border-b">
-        <button 
+        <button
           onClick={() => window.history.back()}
           className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
         >
@@ -72,7 +110,7 @@ const SubjectRubrics = () => {
             Preview
           </button>
           <button
-            onClick={() => toast.error("All Experiments have not been graded yet.")}
+            onClick={() => handleDownloadView()}
             className={`flex items-center gap-2 px-4 py-2 rounded-md transition-all ${
               activeView === "download"
                 ? "bg-gray-900 text-white"
@@ -87,8 +125,18 @@ const SubjectRubrics = () => {
 
       <div className="h-[calc(100vh-64px)]">
         {activeView === "preview" ? (
-          <PDFViewer showToolbar={false} width="100%" height="100%" className="border-0">
-            <RubricsPDF studentData={rubricsData} subjectName={rubricsData.subjectName} />
+          <PDFViewer
+            showToolbar={false}
+            width="100%"
+            height="100%"
+            className="border-0"
+          >
+            <RubricsPDF
+              finalCriterias={criteriaDetails}
+              finalCO={CODetails}
+              studentData={rubricsData}
+              subjectName={rubricsData.subjectName}
+            />
           </PDFViewer>
         ) : (
           <div className="h-full flex items-center justify-center bg-gray-50">
@@ -104,7 +152,9 @@ const SubjectRubrics = () => {
               </p>
               <PDFDownloadLink
                 document={<RubricsPDF studentData={rubricsData} />}
-                fileName={`${rubricsData.studentName.replace(/\s+/g, '_')}_${rubricsData.rollNo}_assessment.pdf`}
+                fileName={`${rubricsData.studentName.replace(/\s+/g, "_")}_${
+                  rubricsData.rollNo
+                }_assessment.pdf`}
                 className="inline-flex items-center justify-center gap-2 bg-gray-900 hover:bg-gray-800 text-white font-medium py-3 px-6 rounded-lg transition-colors w-full"
               >
                 {({ loading }) =>
