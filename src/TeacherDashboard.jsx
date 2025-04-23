@@ -28,32 +28,106 @@ const TeacherDashboard = () => {
     fetchTeacherData();
     fetchExperimentData();
     handleSubjectCriteria();
-  }, []);
+  }, [subject,experimentNo]);
 
   const handleSubjectCriteria = () => {
     if(localStorage.getItem("subjectCriterias")){
       console.log("yes entered")
       const storedData = JSON.parse(localStorage.getItem("subjectCriterias"));
       const currentCriteria = storedData.find((item)=> item.subjectId === subject);
-
-      const finalResult = storedData.map((item)=>{
-        if(item.subjectId === subject){
-          return {...currentCriteria, subjectCriteria: item.subjectCriteria, courseOutcomes: item.courseOutcomes}
-        }else{
-          return item
-        }
-      })
-      setSubjectCriterias(currentCriteria);
+      if(currentCriteria){
+        setSubjectCriterias(currentCriteria);
+      }
     }
   };
 
-  console.log(subjectCriterias)
 
   useEffect(() => {
     if (!subject && !experimentNo) {
       navigate("/teacher-dash");
     }
   }, [subject, experimentNo]);
+
+
+
+
+
+
+  useEffect(() => {
+    const redirectFirst = async () => {
+      try {
+        if (subject && !experimentNo) {
+          const firstExperimentID = await fetchFirstExperimentId();
+          console.log(firstExperimentID)
+          if (firstExperimentID) {
+            navigate(
+              `/teacher-dashboard?exp=${firstExperimentID._id}&sub=${subject}`
+            );
+          }
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    if (subject && !experimentNo) {
+      redirectFirst();
+    }
+  }, [subject, experimentNo]);
+
+  const fetchFirstExperimentId = async () => {
+    if (!subject) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      const allData = JSON.parse(localStorage.getItem("allData"));
+      const currentBatch = allData.batches[0];
+
+      const response = await axios.get(
+        `${
+          import.meta.env.VITE_BACKEND_URL
+        }/api/experiments?subject=${subject}&batch=${currentBatch._id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const sortedExperiments = response.data.sort((a, b) => {
+        const numA = parseInt(a.name.match(/\d+/)?.[0] || 0);
+        const numB = parseInt(b.name.match(/\d+/)?.[0] || 0);
+        return numA - numB;
+      });
+
+      return sortedExperiments[0];
+    } catch (error) {
+      console.error("Error fetching experiments:", error);
+    }
+  };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   const fetchTeacherData = async () => {
     const teacherId = localStorage.getItem("teacherId");
