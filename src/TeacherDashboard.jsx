@@ -56,7 +56,6 @@ const TeacherDashboard = () => {
   };
 
   const fetchExperimentData = async () => {
-    console.log(experimentNo);
     const response = await axios.get(
       `${import.meta.env.VITE_BACKEND_URL}/api/experiments/${experimentNo}`
     );

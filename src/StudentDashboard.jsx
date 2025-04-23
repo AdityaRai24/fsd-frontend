@@ -21,7 +21,6 @@ function StudentDashboard() {
   const fetchStudentData = async () => {
     const sapId = localStorage.getItem("sapId");
     const token = localStorage.getItem("token");
-    console.log("sending");
     try {
       const response = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/api/students/${sapId}`,

@@ -24,7 +24,6 @@ const SubjectRubrics = () => {
       );
       const allExpMarks = [];
       response.data.experiments.map((item) => allExpMarks.push(item.marks));
-      console.log(response.data)
       let newData = {
         allExperimentMarks: allExpMarks,
         rollNo: response.data.rollNo,
@@ -33,8 +32,6 @@ const SubjectRubrics = () => {
         subjectName: response.data.subject,
         subject: response.data.subject
       };
-      console.log("Current subject data:", response.data);
-      console.log("Prepared studentData for PDF:", newData);
       setRubricsData(newData);
     } catch (error) {
       console.log(error);

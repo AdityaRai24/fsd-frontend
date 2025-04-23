@@ -33,7 +33,7 @@ const TableActions = ({
         View
       </Button>
 
-      {downloadAvailable ? (
+      {/* {downloadAvailable ? (
         <PDFDownloadLink
           document={
             <RubricsPDF
@@ -68,7 +68,7 @@ const TableActions = ({
           <Download className="h-4 w-4" />
           Download
         </Button>
-      )}
+      )} */}
     </div>
   );
 };

@@ -43,14 +43,14 @@ const RubricsSettings = () => {
     {
       title: "Strategy (Analyse & / or Evaluate)",
       description: "(Factual/Conceptual/Procedural/Metacognitive)",
-      marks: 5,
+      marks: 0,
       isNull: false,
       order: 4,
     },
     {
       title: "Interpret / Develop",
       description: "(Factual/Conceptual/Procedural/Metacognitive)",
-      marks: 5,
+      marks: 0,
       isNull: false,
       order: 5,
     },
@@ -92,7 +92,6 @@ const RubricsSettings = () => {
     newCriteria[index] = {
       ...newCriteria[index],
       isNull: checked,
-      // If marking as null, store the previous marks value but don't use it
       prevMarks: checked
         ? newCriteria[index].marks
         : newCriteria[index].prevMarks || newCriteria[index].marks,
@@ -130,7 +129,6 @@ const RubricsSettings = () => {
     setCourseOutcomes(newOutcomes);
   };
 
-  console.log(import.meta.env.VITE_BACKEND_URL)
 
   useEffect(() => {
     const fetchRubrics = async () => {
@@ -187,7 +185,6 @@ const RubricsSettings = () => {
         order: index + 1,
       }));
 
-      console.log(courseOutcomes2);
 
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/rubrics`,

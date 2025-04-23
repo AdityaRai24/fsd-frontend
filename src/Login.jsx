@@ -52,7 +52,6 @@ const Login = () => {
         payload
       );
 
-      console.log(response.data);
 
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("role", response.data.role);
