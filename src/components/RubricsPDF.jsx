@@ -377,7 +377,7 @@ const RubricsPDF = ({ studentData, subjectName }) => {
   return (
       <Document>
       <Page size="A4" style={styles.page}>
-        {/* <View style={styles.pageBorder}>
+        <View style={styles.pageBorder}>
           <View style={styles.header}>
             <Image src={RubricsTop} style={styles.headerImg} />
           </View>
@@ -535,11 +535,6 @@ const RubricsPDF = ({ studentData, subjectName }) => {
           <View style={styles.footer}>
             <Image src={RubricsBottom} style={styles.footerImg} />
           </View>
-        </View> */}
-        <View>
-          <Text>
-            Hii
-          </Text>
         </View>
       </Page>
     </Document>

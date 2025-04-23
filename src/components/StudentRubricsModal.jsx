@@ -1,13 +1,37 @@
-import React from 'react';
-import { PDFViewer } from '@react-pdf/renderer';
-import RubricsPDF from './RubricsPDF';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import React, { useEffect, useState } from "react";
+import { pdf } from "@react-pdf/renderer";
+import RubricsPDF from "./RubricsPDF";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
+const StudentRubricsModal = ({ isOpen, onClose, student, subjectName }) => {
+  const [pdfUrl, setPdfUrl] = useState(null);
 
-const StudentRubricsModal = ({ isOpen, onClose, student,subjectName }) => {
+  useEffect(() => {
+    const generatePdf = async () => {
+      if (!student) return;
+      const blob = await pdf(
+        <RubricsPDF subjectName={subjectName} studentData={student} />
+      ).toBlob();
+      const url = URL.createObjectURL(blob);
+      setPdfUrl(url);
+    };
+
+    if (isOpen) {
+      generatePdf();
+    }
+
+    return () => {
+      if (pdfUrl) URL.revokeObjectURL(pdfUrl);
+      setPdfUrl(null);
+    };
+  }, [isOpen, student, subjectName]);
+
   if (!student) return null;
-
-  console.log("openinnngnnng rubbrics")
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -18,9 +42,19 @@ const StudentRubricsModal = ({ isOpen, onClose, student,subjectName }) => {
           </DialogTitle>
         </DialogHeader>
         <div className="mt-4 h-[70vh]">
-          <PDFViewer width="100%" height="100%" showToolbar={false} className="border-0">
-            <RubricsPDF subjectName={subjectName} studentData={student} />
-          </PDFViewer>
+          {pdfUrl ? (
+            <iframe
+              src={pdfUrl}
+              width="100%"
+              height="100%"
+              style={{ border: "none" }}
+              title="Rubrics PDF"
+            />
+          ) : (
+            <div className="flex items-center justify-center h-full text-gray-500">
+              Generating PDF...
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>
