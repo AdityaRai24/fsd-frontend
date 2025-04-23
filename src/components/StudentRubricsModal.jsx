@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { PDFViewer, PDFDownloadLink } from "@react-pdf/renderer";
 import RubricsPDF from "./RubricsPDF";
 import {
@@ -25,32 +25,32 @@ const StudentRubricsModal = ({
 
   const subjectCriterias = useStore((state) => state.subjectCriterias);
 
-  if (!student) return null;
-
   const subjectExists = subjectCriterias.some(
     (subject) => subject.subjectId === subjectName
   );
 
-  let subjectFinalCriteria = null;
-  let subjectFinalCO = null;
+  useEffect(() => {
+    if (!subjectExists && isOpen) {
+      toast.error("No rubrics found for this subject");
+    }
+  }, [subjectExists, isOpen]);
+
+  if (!student || !subjectExists) return null;
+
+  const subjec = subjectCriterias.find(
+    (subject) => subject.subjectId === subjectName
+  );
+
+  const subjectFinalCriteria = subjec.subjectCriteria;
+  const subjectFinalCO = subjec.courseOutcomes;
+
   let downloadAvailable = false;
 
-  if (subjectExists) {
-    const subjec = subjectCriterias.find(
-      (subject) => subject.subjectId === subjectName
-    );
-    subjectFinalCriteria = subjec.subjectCriteria;
-    subjectFinalCO = subjec.courseOutcomes;
-
-    // Check if download is available (valid marks)
-    if (student && student.allExperimentMarks) {
-      downloadAvailable = student.allExperimentMarks.every((experiment) => {
-        const sum = experiment.reduce((total, mark) => total + mark, 0);
-        return sum > 0;
-      });
-    }
-  } else {
-    return toast.error("No rubrics found for this subject");
+  if (student?.allExperimentMarks) {
+    downloadAvailable = student.allExperimentMarks.every((experiment) => {
+      const sum = experiment.reduce((total, mark) => total + mark, 0);
+      return sum > 0;
+    });
   }
 
   const handleTabChange = (value) => {
