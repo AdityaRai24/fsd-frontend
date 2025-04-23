@@ -230,6 +230,8 @@ const styles = StyleSheet.create({
 
 const RubricsPDF = ({ finalCO, finalCriterias, studentData, subjectName }) => {
 
+  console.log(studentData)
+
   if (!studentData) {
     return (
       <Document>

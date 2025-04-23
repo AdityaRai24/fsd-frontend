@@ -25,6 +25,7 @@ import useStudentData from "./useStudentData";
 import StudentRubricsModal from "@/components/StudentRubricsModal";
 import axios from "axios";
 import { Spinner } from "@/components/Spinner"; 
+import toast from "react-hot-toast";
 
 const DataTableComp = ({ editMode, setEditMode, experimentNo }) => {
   const [searchParams] = useSearchParams();
@@ -42,7 +43,6 @@ const DataTableComp = ({ editMode, setEditMode, experimentNo }) => {
   const currentSubject = searchParams.get("sub") || "DevOps";
 
   const {
-    data,
     loading,
     error,
     studentsData,
@@ -52,6 +52,7 @@ const DataTableComp = ({ editMode, setEditMode, experimentNo }) => {
     customMarks,
     setCustomMarks,
   } = useStudentData(currentSubject, experimentNo);
+
 
   useEffect(() => {
     const fetchCriteria = async () => {
@@ -207,10 +208,10 @@ const DataTableComp = ({ editMode, setEditMode, experimentNo }) => {
             ...student,
             totalMarks: change.totalMarks || change.newMarks,
           };
+
         }
         return student;
       });
-
       setStudentsData(updatedStudentsData);
       setCustomMarks({});
       setSectionMarks({});
@@ -409,6 +410,7 @@ const DataTableComp = ({ editMode, setEditMode, experimentNo }) => {
       </div>
     );
   }
+
 
   return (
     <div className="max-w-[80%] mx-auto relative">

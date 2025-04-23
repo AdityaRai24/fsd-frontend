@@ -201,7 +201,8 @@ const RubricsSettings = () => {
 
       const storedData = localStorage.getItem("subjectCriterias");
       if (storedData) {
-        const editedArray = dataArray.map((obj) => {
+        let dataArray = JSON.parse(storedData)
+        const editedArray = dataArray?.map((obj) => {
           if (obj.id === "subjectId") {
             return {
               ...obj,
@@ -222,6 +223,7 @@ const RubricsSettings = () => {
         ];
         localStorage.setItem("subjectCriterias", JSON.stringify(newArray));
       }
+
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/rubrics`,
         {
