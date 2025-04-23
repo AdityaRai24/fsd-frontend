@@ -24,30 +24,22 @@ const TeacherDashboard = () => {
   const setTeacherData = useStore((state) => state.setTeacherData);
   const setSubjectCriterias = useStore((state) => state.setSubjectCriterias);
 
-  // Check for teacherData in localStorage and update Zustand store if needed
   useEffect(() => {
-    // If teacherData already exists in Zustand store, no need to check localStorage
-    if (teacherData) {
-      setLoading(false);
-      return;
-    }
-
-    // Check for teacherData in localStorage
+   
     const storedTeacherData = localStorage.getItem("teacherData");
     if (storedTeacherData) {
       try {
+        localStorage.setItem("allData", storedTeacherData);
         const parsedData = JSON.parse(storedTeacherData);
         setTeacherData(parsedData);
       } catch (err) {
         setError("Failed to parse teacher data from localStorage");
       }
     } else {
-      // If no data in localStorage, redirect to teacher-dash to fetch it
       navigate("/teacher-dash");
       return;
     }
 
-    // Check and set subject criterias from localStorage
     const subjectCriterias = localStorage.getItem("subjectCriterias");
     if (subjectCriterias) {
       try {
@@ -81,7 +73,7 @@ const TeacherDashboard = () => {
       try {
         if (subject && !experimentNo) {
           const firstExperimentID = await fetchFirstExperimentId();
-          console.log(firstExperimentID)
+          console.log(firstExperimentID);
           if (firstExperimentID) {
             navigate(
               `/teacher-dashboard?exp=${firstExperimentID._id}&sub=${subject}`

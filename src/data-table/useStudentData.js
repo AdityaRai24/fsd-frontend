@@ -117,19 +117,17 @@ const useStudentData = (currentSubject) => {
 
     loadData();
 
-    // Cleanup function to prevent state updates after unmounting
-    return () => {
+      return () => {
       isMounted = false;
     };
   }, [currentSubject, experimentNo]);
 
-  // Function to update local storage after saving changes
   const updateLocalStorage = (updatedStudents) => {
     try {
       const allData = JSON.parse(localStorage.getItem("allData"));
       if (!allData) return false;
 
-      const batchIndex = 0; // Assuming we're working with the first batch
+      const batchIndex = 0;
 
       // Deep clone to avoid reference issues
       const newAllData = JSON.parse(JSON.stringify(allData));

@@ -285,7 +285,6 @@ const DataTableComp = ({ editMode, setEditMode, experimentNo }) => {
   }, [editMode]);
 
   useEffect(() => {
-    // Reset local state when subject or experiment changes
     setCustomMarks({});
     setSectionMarks({});
     setMarksInputType({});
@@ -395,6 +394,7 @@ const DataTableComp = ({ editMode, setEditMode, experimentNo }) => {
   }
 
   if (error) {
+    console.log(error)
     return (
       <div className="max-w-[80%] mx-auto p-4 border border-red-200 rounded-md bg-red-50 text-center my-4">
         <p className="text-red-500">
