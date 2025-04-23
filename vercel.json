@@ -1,0 +1,7 @@
+{
+    "rewrites" : [
+        {
+            "source" : "/(.*)","destination" : "/teacher-dashboard?sub=DevOps"
+        }
+    ]
+}

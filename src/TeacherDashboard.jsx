@@ -23,6 +23,7 @@ const TeacherDashboard = () => {
   const navigate = useNavigate();
   const subjectCriterias = useStore((state) => state.subjectCriterias);
   const setSubjectCriterias = useStore((state) => state.setSubjectCriterias);
+  const [newLoading, setNewLoading] = useState(false);
 
   useEffect(() => {
     fetchTeacherData();
@@ -55,6 +56,7 @@ const TeacherDashboard = () => {
 
   useEffect(() => {
     const redirectFirst = async () => {
+      setNewLoading(true)
       try {
         if (subject && !experimentNo) {
           const firstExperimentID = await fetchFirstExperimentId();
@@ -67,6 +69,8 @@ const TeacherDashboard = () => {
         }
       } catch (error) {
         console.log(error);
+      }finally{
+        setNewLoading(false);
       }
     };
 
@@ -196,11 +200,11 @@ const TeacherDashboard = () => {
             <p className="text-gray-600 text-base">{experiment?.name}</p>
           </div>
         </div>
-        <DataTableComp
+       {newLoading ? <div>Loading...</div> : <DataTableComp
           experimentNo={experimentNo}
           editMode={editMode}
           setEditMode={setEditMode}
-        />
+        />}
       </main>
     </SidebarProvider>
   );
