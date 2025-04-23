@@ -11,7 +11,6 @@ import {
 import RubricsTop from "@/assets/rubrics_top.png";
 import RubricsBottom from "@/assets/rubrics_bottom.png";
 import axios from "axios";
-import { useParams, useSearchParams } from "react-router";
 
 const styles = StyleSheet.create({
   page: {
@@ -235,6 +234,9 @@ const styles = StyleSheet.create({
 });
 
 const RubricsPDF = ({ studentData, subjectName }) => {
+
+
+
   const defaultCriteria = [
     {
       title: "Knowledge",
@@ -288,6 +290,9 @@ const RubricsPDF = ({ studentData, subjectName }) => {
 
   useEffect(() => {
     const fetchCriteria = async () => {
+
+      if (typeof window === "undefined") return; // Prevent SSR crash
+
       try {
         const subjectResponse = await axios.get(
           `${import.meta.env.VITE_BACKEND_URL}/api/subjects/name/${subjectName}`,
@@ -334,6 +339,9 @@ const RubricsPDF = ({ studentData, subjectName }) => {
 
     fetchCriteria();
   }, [studentData?.subjectName]);
+
+  if (!studentData) return <div>Loading...</div>;
+
 
   const rowData = (criteria || defaultCriteria).map((criterion, index) => ({
     title: `${index + 1}. ${criterion.title} (${criterion.marks})`,
