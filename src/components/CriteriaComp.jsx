@@ -151,6 +151,7 @@ const CriteriaComp = ({ criteria, subjectName }) => {
   }, [subjectName]);
 
   // Show loading state until we have valid criteria data
+  // try again
   if (
     isLoading ||
     !finalCriteria ||
