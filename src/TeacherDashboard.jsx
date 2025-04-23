@@ -25,7 +25,7 @@ const TeacherDashboard = () => {
   useEffect(() => {
     fetchTeacherData();
     fetchExperimentData();
-  }, []);
+  }, [experimentNo]);
 
   useEffect(() => {
     if (!subject && !experimentNo) {
@@ -54,6 +54,7 @@ const TeacherDashboard = () => {
       setLoading(false);
     }
   };
+
 
   const fetchExperimentData = async () => {
     const response = await axios.get(

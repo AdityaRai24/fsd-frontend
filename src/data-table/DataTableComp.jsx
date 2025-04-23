@@ -159,7 +159,6 @@ const DataTableComp = ({ editMode, setEditMode, experimentNo }) => {
 
           const student = tableRow.original;
 
-          // Use the existing section marks values directly
           const sectionMarksArray = [
             Number(sections.section1 || 0),
             Number(sections.section2 || 0),
@@ -199,7 +198,6 @@ const DataTableComp = ({ editMode, setEditMode, experimentNo }) => {
         allChanges
       );
 
-      // Update the local data with the new marks
       const updatedStudentsData = studentsData.map((student) => {
         const change = allChanges.find(
           (c) => c.studentId === student.studentId
@@ -221,7 +219,6 @@ const DataTableComp = ({ editMode, setEditMode, experimentNo }) => {
       setEditMode(false);
     } catch (error) {
       console.error("Error updating marks:", error);
-      // Handle the error state appropriately here
     } finally {
       setIsSaving(false);
     }

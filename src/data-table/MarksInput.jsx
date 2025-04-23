@@ -35,7 +35,6 @@ const MarksInput = ({
   const subjectExists = subjectCriterias.some(
     (subject) => subject.subjectId === currentSubject
   );
-  console.log({subjectCriterias,subjectExists})
 
   useEffect(() => {
     if (!subjectExists || !currentSubject) {
@@ -63,7 +62,6 @@ const MarksInput = ({
     ) {
       const initialSectionMarks = {};
 
-      // Map student marks to section IDs
       if (student.marks && Array.isArray(student.marks)) {
         criteria.forEach((criterion, index) => {
           initialSectionMarks[`section${index + 1}`] =
@@ -75,7 +73,6 @@ const MarksInput = ({
           [row.id]: initialSectionMarks,
         }));
       } else {
-        // Initialize with zeros if no student marks available
         criteria.forEach((criterion, index) => {
           initialSectionMarks[`section${index + 1}`] =
             criterion.marks === 0 ? "--" : 0;

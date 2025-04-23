@@ -1,13 +1,36 @@
-import React from 'react';
-import { PDFViewer } from '@react-pdf/renderer';
-import RubricsPDF from './RubricsPDF';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+"use client";
+import React from "react";
+import { PDFViewer } from "@react-pdf/renderer";
+import RubricsPDF from "./RubricsPDF";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useStore } from "@/store/useStore";
+import toast from "react-hot-toast";
 
-
-const StudentRubricsModal = ({ isOpen, onClose, student,subjectName }) => {
+const StudentRubricsModal = ({ isOpen, onClose, student, subjectName }) => {
   if (!student) return null;
 
-  console.log("openinnngnnng rubbrics")
+  const subjectCriterias = useStore((state) => state.subjectCriterias);
+  const subjectExists = subjectCriterias.some(
+    (subject) => subject.subjectId === subjectName
+  );
+
+  let subjectFinalCriteria = null;
+  let subjectFinalCO = null;
+
+  if (subjectExists) {
+    const subjec = subjectCriterias.find(
+      (subject) => subject.subjectId === subjectName
+    );
+    subjectFinalCriteria = subjec.subjectCriteria;
+    subjectFinalCO = subjec.courseOutcomes;
+  } else {
+    return toast.error("No rubrics found for this subject");
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -18,8 +41,18 @@ const StudentRubricsModal = ({ isOpen, onClose, student,subjectName }) => {
           </DialogTitle>
         </DialogHeader>
         <div className="mt-4 h-[70vh]">
-          <PDFViewer width="100%" height="100%" showToolbar={false} className="border-0">
-            <RubricsPDF subjectName={subjectName} studentData={student} />
+          <PDFViewer
+            width="100%"
+            height="100%"
+            showToolbar={false}
+            className="border-0"
+          >
+            <RubricsPDF
+              finalCO={subjectFinalCO}
+              finalCriterias={subjectFinalCriteria}
+              subjectName={subjectName}
+              studentData={student}
+            />
           </PDFViewer>
         </div>
       </DialogContent>

@@ -9,7 +9,6 @@ import {
 } from "@react-pdf/renderer";
 import RubricsTop from "@/assets/rubrics_top.png";
 import RubricsBottom from "@/assets/rubrics_bottom.png";
-import axios from "axios";
 
 const styles = StyleSheet.create({
   page: {
@@ -229,167 +228,8 @@ const styles = StyleSheet.create({
   },
 });
 
-const RubricsPDF = ({ studentData, subjectName }) => {
-  const [criteria, setCriteria] = useState([]);
-  const [courseOutcomes, setCourseOutcomes] = useState(Array(10).fill(1));
-  const [isLoading, setIsLoading] = useState(true);
-  const [isDataReady, setIsDataReady] = useState(false);
+const RubricsPDF = ({ finalCO, finalCriterias, studentData, subjectName }) => {
 
-  useEffect(() => {
-    const fetchCriteria = async () => {
-      if (typeof window === "undefined") {
-        setIsLoading(false);
-        return;
-      }
-
-      setIsLoading(true);
-      try {
-        const subjectResponse = await axios.get(
-          `${
-            import.meta.env.VITE_BACKEND_URL
-          }/api/subjects/name/${subjectName}`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
-
-        if (!subjectResponse.data?._id) {
-          console.log("No subject ID found for name:", subjectName);
-          // Set default criteria as fallback
-          setCriteria([
-            {
-              title: "Understanding of Concept",
-              description: "Evaluates student's grasp of theoretical concepts",
-              marks: 5,
-            },
-            {
-              title: "Implementation",
-              description: "Ability to implement the solution",
-              marks: 5,
-            },
-            {
-              title: "Documentation",
-              description: "Quality of code documentation and explanation",
-              marks: 5,
-            },
-            {
-              title: "Problem Solving",
-              description: "Approaches to problem solving",
-              marks: 5,
-            },
-            {
-              title: "Code Quality",
-              description: "Readability and efficiency of code",
-              marks: 5,
-            },
-          ]);
-          setIsDataReady(true);
-          setIsLoading(false);
-          return;
-        }
-
-        const subjectId = subjectResponse.data._id;
-
-        const rubricsResponse = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/api/rubrics/${subjectId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
-
-        if (rubricsResponse.data?.courseOutcomes) {
-          setCourseOutcomes(rubricsResponse.data.courseOutcomes);
-        }
-
-        if (
-          rubricsResponse.data?.criteria &&
-          Array.isArray(rubricsResponse.data.criteria) &&
-          rubricsResponse.data.criteria.length > 0
-        ) {
-          console.log("Using custom criteria:", rubricsResponse.data.criteria);
-          setCriteria(rubricsResponse.data.criteria);
-        } else {
-          console.log("No custom criteria found, using defaults");
-          // Set default criteria if none found
-          setCriteria([
-            {
-              title: "Understanding of Concept",
-              description: "Evaluates student's grasp of theoretical concepts",
-              marks: 5,
-            },
-            {
-              title: "Implementation",
-              description: "Ability to implement the solution",
-              marks: 5,
-            },
-            {
-              title: "Documentation",
-              description: "Quality of code documentation and explanation",
-              marks: 5,
-            },
-            {
-              title: "Problem Solving",
-              description: "Approaches to problem solving",
-              marks: 5,
-            },
-            {
-              title: "Code Quality",
-              description: "Readability and efficiency of code",
-              marks: 5,
-            },
-          ]);
-        }
-      } catch (error) {
-        console.error("Error fetching criteria:", error);
-        // Set default criteria on error
-        setCriteria([
-          {
-            title: "Understanding of Concept",
-            description: "Evaluates student's grasp of theoretical concepts",
-            marks: 5,
-          },
-          {
-            title: "Implementation",
-            description: "Ability to implement the solution",
-            marks: 5,
-          },
-          {
-            title: "Documentation",
-            description: "Quality of code documentation and explanation",
-            marks: 5,
-          },
-          {
-            title: "Problem Solving",
-            description: "Approaches to problem solving",
-            marks: 5,
-          },
-          {
-            title: "Code Quality",
-            description: "Readability and efficiency of code",
-            marks: 5,
-          },
-        ]);
-      } finally {
-        setIsLoading(false);
-        setIsDataReady(true);
-      }
-    };
-
-    fetchCriteria();
-  }, [subjectName]);
-
-  // Expose the isDataReady state to parent component
-  useEffect(() => {
-    if (typeof window !== "undefined" && window.onPdfDataReady && isDataReady) {
-      window.onPdfDataReady();
-    }
-  }, [isDataReady]);
-
-  // If still loading and no criteria, show loading indicator
   if (!studentData) {
     return (
       <Document>
@@ -401,8 +241,6 @@ const RubricsPDF = ({ studentData, subjectName }) => {
       </Document>
     );
   }
-
-  console.log("Criteria just before rendering",criteria)
 
   return (
     <Document>
@@ -487,7 +325,7 @@ const RubricsPDF = ({ studentData, subjectName }) => {
               <View style={[styles.tableHeaderCell, styles.indicatorCell]}>
                 <Text>Course Outcome</Text>
               </View>
-              {courseOutcomes?.map((co, index) => (
+              {finalCO?.map((co, index) => (
                 <View
                   key={`co-${index}`}
                   style={[styles.tableHeaderCell, styles.numberCell]}
@@ -497,7 +335,7 @@ const RubricsPDF = ({ studentData, subjectName }) => {
               ))}
             </View>
 
-            {criteria?.map((criterion, index) => (
+            {finalCriterias?.map((criterion, index) => (
               <View style={styles.tableRow} key={`criterion-${index}`}>
                 <View style={[styles.tableCellFields, styles.indicatorCell]}>
                   <Text>
