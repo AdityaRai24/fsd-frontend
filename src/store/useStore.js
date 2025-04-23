@@ -2,6 +2,7 @@ import { create } from "zustand";
 
 export const useStore = create((set) => ({
   subjectCriterias: [],
+  teacherData: null,
 
   setSubjectCriterias: (newCriteria) =>
     set((state) => {
@@ -20,4 +21,6 @@ export const useStore = create((set) => ({
 
       return { subjectCriterias: updatedList };
     }),
+
+  setTeacherData: (teacherData) => set({ teacherData }),
 }));

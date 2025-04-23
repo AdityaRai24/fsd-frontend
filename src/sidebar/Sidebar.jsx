@@ -149,7 +149,6 @@ export function AppSidebar({ teacher, ...props }) {
           }
         );
 
-        // Sort experiments by extracting number from experiment name
         const sortedExperiments = response.data.sort((a, b) => {
           const numA = parseInt(a.name.match(/\d+/)?.[0] || 0);
           const numB = parseInt(b.name.match(/\d+/)?.[0] || 0);
@@ -168,17 +167,13 @@ export function AppSidebar({ teacher, ...props }) {
 
   const handleSubChange = (team) => {
     setActiveTeam(team);
-    navigate(`/teacher-dashboard?exp=1&sub=${team.name}`);
+    navigate(`/teacher-dashboard?sub=${team.name}`);
   };
 
   const handleExperimentClick = (index) => {
     navigate(
       `/teacher-dashboard?exp=${experiments[index]._id}&sub=${activeTeam.name}`
     );
-  };
-
-  const handleViewStudents = () => {
-    navigate(`/view-students?sub=${activeTeam.name}`);
   };
 
   const handleAddExperiment = async () => {

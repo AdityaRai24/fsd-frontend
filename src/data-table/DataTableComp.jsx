@@ -228,25 +228,19 @@ const DataTableComp = ({ editMode, setEditMode, experimentNo }) => {
 
     totalMarks = Math.round(Number(totalMarks));
 
-    // Create an array with length matching criteria
     const marks = new Array(criteria.length).fill(0);
 
-    // Get total maximum marks possible (sum of all criteria marks)
     const totalMaxMarks = criteria.reduce((sum, criterion) => sum + (criterion.marks || 0), 0);
 
-    // If no marks are possible or no criteria, return array of zeros
     if (totalMaxMarks === 0 || criteria.length === 0) {
       return marks;
     }
 
-    // Calculate the proportion of total marks each criterion should get
     criteria.forEach((criterion, index) => {
       if (criterion.marks === 0) {
         marks[index] = 0;
       } else {
-        // Calculate proportional marks for this criterion
         const proportionalMarks = (totalMarks * criterion.marks) / totalMaxMarks;
-        // Round to nearest number and ensure it doesn't exceed criterion's max marks
         marks[index] = Math.min(
           Math.round(proportionalMarks),
           criterion.marks
@@ -254,11 +248,9 @@ const DataTableComp = ({ editMode, setEditMode, experimentNo }) => {
       }
     });
 
-    // Adjust for rounding errors to match total marks
     const currentTotal = marks.reduce((sum, mark) => sum + mark, 0);
     let difference = totalMarks - currentTotal;
 
-    // Distribute the difference
     while (difference !== 0) {
       for (let i = 0; i < marks.length && difference !== 0; i++) {
         if (criteria[i].marks === 0) continue; // Skip criteria with 0 marks
@@ -271,7 +263,6 @@ const DataTableComp = ({ editMode, setEditMode, experimentNo }) => {
           difference++;
         }
       }
-      // Break if we can't distribute any more
       if (difference !== 0 && marks.every((mark, i) => 
         mark === (difference > 0 ? criteria[i].marks : 0)
       )) break;

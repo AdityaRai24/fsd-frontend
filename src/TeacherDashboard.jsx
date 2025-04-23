@@ -10,86 +10,141 @@ import { Toaster } from "react-hot-toast";
 import { useStore } from "./store/useStore";
 
 const TeacherDashboard = () => {
-  const [teacher, setTeacher] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchParams] = useSearchParams();
   const [editMode, setEditMode] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [experiment, setExperiment] = useState(null);
-  const [teacherSubjects, setTeacherSubjects] = useState(null);
   const subject = searchParams.get("sub");
   const experimentNo = searchParams.get("exp");
   const navigate = useNavigate();
 
+  const teacherData = useStore((state) => state.teacherData);
+  const setTeacherData = useStore((state) => state.setTeacherData);
+  const setSubjectCriterias = useStore((state) => state.setSubjectCriterias);
+
+  // Check for teacherData in localStorage and update Zustand store if needed
   useEffect(() => {
-    fetchTeacherData();
-    fetchExperimentData();
-  }, [experimentNo]);
+    // If teacherData already exists in Zustand store, no need to check localStorage
+    if (teacherData) {
+      setLoading(false);
+      return;
+    }
+
+    // Check for teacherData in localStorage
+    const storedTeacherData = localStorage.getItem("teacherData");
+    if (storedTeacherData) {
+      try {
+        const parsedData = JSON.parse(storedTeacherData);
+        setTeacherData(parsedData);
+      } catch (err) {
+        setError("Failed to parse teacher data from localStorage");
+      }
+    } else {
+      // If no data in localStorage, redirect to teacher-dash to fetch it
+      navigate("/teacher-dash");
+      return;
+    }
+
+    // Check and set subject criterias from localStorage
+    const subjectCriterias = localStorage.getItem("subjectCriterias");
+    if (subjectCriterias) {
+      try {
+        let parsedData = JSON.parse(subjectCriterias);
+        const criteriaFinal = parsedData.find(
+          (item) => item.subjectId === subject
+        );
+        if (criteriaFinal) {
+          setSubjectCriterias(criteriaFinal);
+        }
+      } catch (err) {
+        console.error("Failed to parse subject criterias", err);
+      }
+    }
+
+    setLoading(false);
+  }, []);
 
   useEffect(() => {
-    if (!subject && !experimentNo) {
+    fetchExperimentData();
+  }, [subject, experimentNo]);
+
+  useEffect(() => {
+    if (!subject) {
       navigate("/teacher-dash");
     }
   }, [subject, experimentNo]);
 
-  const fetchTeacherData = async () => {
-    const teacherId = localStorage.getItem("teacherId");
-    const token = localStorage.getItem("token");
+  useEffect(() => {
+    const redirectFirst = async () => {
+      try {
+        if (subject && !experimentNo) {
+          const firstExperimentID = await fetchFirstExperimentId();
+          console.log(firstExperimentID)
+          if (firstExperimentID) {
+            navigate(
+              `/teacher-dashboard?exp=${firstExperimentID._id}&sub=${subject}`
+            );
+          }
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    if (subject && !experimentNo) {
+      redirectFirst();
+    }
+  }, [subject, experimentNo]);
+
+  const fetchFirstExperimentId = async () => {
+    if (!subject) return;
 
     try {
+      const token = localStorage.getItem("token");
+      const allData = JSON.parse(localStorage.getItem("allData"));
+      const currentBatch = allData.batches[0];
+
       const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/api/teachers/${teacherId}`,
+        `${
+          import.meta.env.VITE_BACKEND_URL
+        }/api/experiments?subject=${subject}&batch=${currentBatch._id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-      localStorage.setItem("allData", JSON.stringify(response.data));
-      setTeacher(response.data);
+
+      const sortedExperiments = response.data.sort((a, b) => {
+        const numA = parseInt(a.name.match(/\d+/)?.[0] || 0);
+        const numB = parseInt(b.name.match(/\d+/)?.[0] || 0);
+        return numA - numB;
+      });
+
+      return sortedExperiments[0];
+    } catch (error) {
+      console.error("Error fetching experiments:", error);
+    }
+  };
+
+  const fetchExperimentData = async () => {
+    if (!experimentNo) return;
+
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/experiments/${experimentNo}`
+      );
+      setExperiment(response.data);
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to fetch teacher data");
+      setError("Failed to fetch experiment data");
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
-
-
-  const fetchExperimentData = async () => {
-    const response = await axios.get(
-      `${import.meta.env.VITE_BACKEND_URL}/api/experiments/${experimentNo}`
-    );
-    setExperiment(response.data);
-  };
-
-  const fetchTeacherSubjects = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/api/teachers/${
-          teacher?._id
-        }/subjects`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setTeacherSubjects(response.data.teacher[0]);
-    } catch (error) {
-      console.error("Error fetching teacher subjects:", error);
-      toast.error("Failed to fetch subjects");
-    }
-  };
-
-  useEffect(() => {
-    if (teacher?._id) {
-      fetchTeacherSubjects();
-    }
-  }, [teacher]);
-
-  const setSubjectCriterias = useStore((state) => state.setSubjectCriterias);
 
   if (loading) {
     return (
@@ -109,17 +164,10 @@ const TeacherDashboard = () => {
     );
   }
 
-  const subjectCriterias = localStorage.getItem("subjectCriterias");
-  if (subjectCriterias) {
-    let parsedData = JSON.parse(subjectCriterias);
-    const criteriaFinal = parsedData.find((item) => item.subjectId === subject);
-    setSubjectCriterias(criteriaFinal);
-  }
-
   return (
     <SidebarProvider>
       <Toaster position="top-center" />
-      <AppSidebar teacher={teacher} />
+      <AppSidebar teacher={teacherData} />
       <SidebarTrigger
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
         className="relative ml-16 mt-5"
