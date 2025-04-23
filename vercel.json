@@ -1,7 +1,28 @@
 {
-    "rewrites" : [
+    "routes" : [
         {
-            "source" : "/(.*)","destination" : "/teacher-dashboard?sub=DevOps"
+            "src" : "/",
+            "dest" : "/"
+        },
+        {
+            "src" : "/student-dashboard",
+            "dest" : "/student-dashboard"
+        },
+        {
+            "src" : "/student-dashboard/:subjectId",
+            "dest" : "/student-dashboard/:subjectId"
+        },
+        {
+            "src" : "/teacher-dashboard",
+            "dest" : "/teacher-dashboard"
+        },
+        {
+            "src" : "/teacher-dash",
+            "dest" : "/teacher-dash"
+        }, 
+        {
+            "src" : "/rubrics-settings/:subjectId",
+            "dest" : "/rubrics-settings/:subjectId"
         }
     ]
 }
