@@ -20,7 +20,7 @@ const SubjectRubrics = () => {
   const fetchRubricsDetails = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:8000/api/students/${subjectId}/${userId}`
+        `${import.meta.env.VITE_BACKEND_URL}/api/students/${subjectId}/${userId}`
       );
       const allExpMarks = [];
       response.data.experiments.map((item) => allExpMarks.push(item.marks));

@@ -21,7 +21,7 @@ const TeacherDash = () => {
 
     try {
       const response = await axios.get(
-        `http://localhost:8000/api/teachers/${teacherId}`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/teachers/${teacherId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

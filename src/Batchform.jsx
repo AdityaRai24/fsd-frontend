@@ -65,8 +65,8 @@ const BatchForm = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
-    axios.get("http://localhost:8000/api/subjects").then((res) => setSubjects(res.data));
-    axios.get("http://localhost:8000/api/students").then((res) => {
+    axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/subjects`).then((res) => setSubjects(res.data));
+    axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/students`).then((res) => {
       setStudents(res.data);
       setFilteredStudents(res.data);
     });

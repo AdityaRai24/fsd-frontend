@@ -57,7 +57,7 @@ const DataTableComp = ({ editMode, setEditMode, experimentNo }) => {
     const fetchCriteria = async () => {
       try {
         const subjectResponse = await axios.get(
-          `http://localhost:8000/api/subjects/name/${currentSubject}`,
+          `${import.meta.env.VITE_BACKEND_URL}/api/subjects/name/${currentSubject}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -70,7 +70,7 @@ const DataTableComp = ({ editMode, setEditMode, experimentNo }) => {
         const subjectId = subjectResponse.data._id;
 
         const rubricsResponse = await axios.get(
-          `http://localhost:8000/api/rubrics/${subjectId}`,
+          `${import.meta.env.VITE_BACKEND_URL}/api/rubrics/${subjectId}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -195,7 +195,7 @@ const DataTableComp = ({ editMode, setEditMode, experimentNo }) => {
       }
 
       const response = await axios.post(
-        "http://localhost:8000/api/students/update-marks",
+        "${import.meta.env.VITE_BACKEND_URL}/api/students/update-marks",
         allChanges
       );
 

@@ -130,6 +130,8 @@ const RubricsSettings = () => {
     setCourseOutcomes(newOutcomes);
   };
 
+  console.log(import.meta.env.VITE_BACKEND_URL)
+
   useEffect(() => {
     const fetchRubrics = async () => {
       try {
@@ -139,7 +141,7 @@ const RubricsSettings = () => {
         }
 
         const response = await axios.get(
-          `http://localhost:8000/api/rubrics/${subjectId}`,
+          `${import.meta.env.VITE_BACKEND_URL}/api/rubrics/${subjectId}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -188,7 +190,7 @@ const RubricsSettings = () => {
       console.log(courseOutcomes2);
 
       const response = await axios.post(
-        "http://localhost:8000/api/rubrics",
+        `${import.meta.env.VITE_BACKEND_URL}/api/rubrics`,
         {
           subject: subjectId,
           criteria: orderedCriteria,

@@ -24,7 +24,7 @@ const ViewStudents = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get(
-          `http://localhost:8000/api/students/subject/${subject}`,
+          `${import.meta.env.VITE_BACKEND_URL}/api/students/subject/${subject}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

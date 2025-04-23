@@ -69,7 +69,7 @@ const MarksInput = ({
         }
 
         const subjectResponse = await axios.get(
-          `http://localhost:8000/api/subjects/name/${subjectName}`,
+          `${import.meta.env.VITE_BACKEND_URL}/api/subjects/name/${subjectName}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -84,7 +84,7 @@ const MarksInput = ({
         const subjectId = subjectResponse.data._id;
 
         const rubricsResponse = await axios.get(
-          `http://localhost:8000/api/rubrics/${subjectId}`,
+          `${import.meta.env.VITE_BACKEND_URL}/api/rubrics/${subjectId}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,

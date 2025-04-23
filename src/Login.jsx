@@ -23,12 +23,15 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
-    
+
     if (token) {
-      navigate(role === "student" ? "/student-dashboard" : "/teacher-dashboard");
+      navigate(
+        role === "student" ? "/student-dashboard" : "/teacher-dashboard"
+      );
     }
   }, [navigate]);
 
@@ -45,11 +48,11 @@ const Login = () => {
       };
 
       const response = await axios.post(
-        "http://localhost:8000/api/auth/login",
+        `${import.meta.env.VITE_BACKEND_URL}/api/auth/login`,
         payload
       );
 
-      console.log(response.data)
+      console.log(response.data);
 
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("role", response.data.role);
@@ -101,14 +104,14 @@ const Login = () => {
           <Tabs value={role} onValueChange={handleTabChange} className="w-full">
             <div className="px-6 pt-6">
               <TabsList className="grid grid-cols-2 w-full">
-                <TabsTrigger 
-                  value="student" 
+                <TabsTrigger
+                  value="student"
                   className="data-[state=active]:bg-gray-900 data-[state=active]:text-white"
                 >
                   <GraduationCap className="w-4 h-4 mr-2" />
                   Student
                 </TabsTrigger>
-                <TabsTrigger 
+                <TabsTrigger
                   value="teacher"
                   className="data-[state=active]:bg-gray-900 data-[state=active]:text-white"
                 >
@@ -121,8 +124,16 @@ const Login = () => {
             <CardContent className="mt-6">
               {error && (
                 <div className="mb-4 p-4 rounded-lg bg-red-50 border border-red-100 flex items-center text-red-600 text-sm">
-                  <svg className="w-5 h-5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  <svg
+                    className="w-5 h-5 mr-2 flex-shrink-0"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                   {error}
                 </div>
@@ -131,7 +142,10 @@ const Login = () => {
               <form onSubmit={handleLogin} className="space-y-6">
                 <TabsContent value="student" className="mt-0">
                   <div className="space-y-2">
-                    <Label htmlFor="sapId" className="text-sm font-medium text-gray-700">
+                    <Label
+                      htmlFor="sapId"
+                      className="text-sm font-medium text-gray-700"
+                    >
                       SAP ID
                     </Label>
                     <div className="relative">
@@ -152,7 +166,10 @@ const Login = () => {
 
                 <TabsContent value="teacher" className="mt-0">
                   <div className="space-y-2">
-                    <Label htmlFor="teacherId" className="text-sm font-medium text-gray-700">
+                    <Label
+                      htmlFor="teacherId"
+                      className="text-sm font-medium text-gray-700"
+                    >
                       Teacher ID
                     </Label>
                     <div className="relative">
@@ -172,7 +189,10 @@ const Login = () => {
                 </TabsContent>
 
                 <div className="space-y-2">
-                  <Label htmlFor="password" className="text-sm font-medium text-gray-700">
+                  <Label
+                    htmlFor="password"
+                    className="text-sm font-medium text-gray-700"
+                  >
                     Password
                   </Label>
                   <div className="relative">

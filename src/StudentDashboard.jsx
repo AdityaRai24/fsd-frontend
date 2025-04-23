@@ -24,7 +24,7 @@ function StudentDashboard() {
     console.log("sending");
     try {
       const response = await axios.get(
-        `http://localhost:8000/api/students/${sapId}`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/students/${sapId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
