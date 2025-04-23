@@ -13,12 +13,12 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { useStore } from "./store/useStore";
 
 const RubricsSettings = () => {
   const { subjectId } = useParams();
   const navigate = useNavigate();
 
-  // Updated defaultCriteria - making isNull true for any criterion with marks=0
   const defaultCriteria = [
     {
       title: "Knowledge",
@@ -77,12 +77,11 @@ const RubricsSettings = () => {
   ];
 
   const [criteria, setCriteria] = useState(defaultCriteria);
-
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-
   const [courseOutcomes, setCourseOutcomes] = useState(Array(10).fill(1));
+  const setSubjectCriterias = useStore((state) => state.setSubjectCriterias);
 
   const handleCriteriaChange = (index, field, value) => {
     const newCriteria = [...criteria];
@@ -191,6 +190,38 @@ const RubricsSettings = () => {
         order: index + 1,
       }));
 
+      const allData = JSON.parse(localStorage.getItem("allData"));
+      const subjectName = allData?.batches[0]?.subjects[0]?.name;
+
+      setSubjectCriterias({
+        subjectId: subjectName,
+        subjectCriteria: orderedCriteria,
+        courseOutcomes: courseOutcomes2,
+      });
+
+      const storedData = localStorage.getItem("subjectCriterias");
+      if (storedData) {
+        const editedArray = dataArray.map((obj) => {
+          if (obj.id === "subjectId") {
+            return {
+              ...obj,
+              subjectCriteria: orderedCriteria,
+              courseOutcomes: courseOutcomes2,
+            };
+          }
+          return obj;
+        });
+        localStorage.setItem("subjectCriterias", JSON.stringify(editedArray));
+      } else {
+        const newArray = [
+          {
+            subjectId: subjectName,
+            subjectCriteria: orderedCriteria,
+            courseOutcomes: courseOutcomes2,
+          },
+        ];
+        localStorage.setItem("subjectCriterias", JSON.stringify(newArray));
+      }
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/rubrics`,
         {

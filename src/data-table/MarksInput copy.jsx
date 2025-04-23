@@ -1,9 +1,9 @@
-"use client";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "@/components/ui/input";
+import axios from "axios";
 import {
   Select,
   SelectContent,
@@ -17,7 +17,6 @@ const MarksInput = ({
   row,
   scoringType,
   setScoringType,
-  currentSubject,
   sectionMarks,
   setSectionMarks,
   customMarks,
@@ -28,32 +27,81 @@ const MarksInput = ({
   disabled = false,
 }) => {
   const [criteria, setCriteria] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const currentScoringType = scoringType[row.id] || "overall";
   const student = row.original;
+  const dataFetched = useRef(false);
+  const subjectCriterias = useStore((state) => state.subjectCriterias)
 
-  const subjectCriterias = useStore((state) => state.subjectCriterias);
-  const subjectExists = subjectCriterias.some(
-    (subject) => subject.subjectId === currentSubject
-  );
-  console.log({subjectCriterias,subjectExists})
+  const defaultCriteria = [
+    { title: "Knowledge", marks: 5, order: 1 },
+    { title: "Describe", marks: 5, order: 2 },
+    { title: "Demonstration", marks: 5, order: 3 },
+    { title: "Strategy", marks: 0, order: 4 },
+    { title: "Interpret / Develop", marks: 0, order: 5 },
+    { title: "Attitude", marks: 5, order: 6 },
+    { title: "Non-verbal Skills", marks: 5, order: 7 },
+  ];
 
   useEffect(() => {
-    if (!subjectExists || !currentSubject) {
+    if (criteria.length === 0) {
+      setCriteria(defaultCriteria);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (dataFetched.current) {
       return;
     }
 
-    const currentSubjectCriteria = subjectCriterias.find(
-      (subject) => subject.subjectId === currentSubject
-    );
+    const fetchCriteria = async () => {
+      dataFetched.current = true; 
 
-    if (
-      currentSubjectCriteria &&
-      currentSubjectCriteria.subjectCriteria &&
-      currentSubjectCriteria.subjectCriteria.length > 0
-    ) {
-      setCriteria(currentSubjectCriteria.subjectCriteria);
-    }
-  }, [currentSubject, subjectCriterias, subjectExists]);
+      try {
+        const allData = JSON.parse(localStorage.getItem("allData"));
+        const subjectName = allData?.batches[0]?.subjects[0]?.name;
+
+        if (!subjectName) {
+          return;
+        }
+
+        const subjectResponse = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/api/subjects/name/${subjectName}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+
+        if (!subjectResponse.data?._id) {
+          return;
+        }
+
+        const subjectId = subjectResponse.data._id;
+
+        const rubricsResponse = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/api/rubrics/${subjectId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+
+        if (
+          rubricsResponse.data?.criteria &&
+          rubricsResponse.data.criteria.length > 0
+        ) {
+          setCriteria(rubricsResponse.data.criteria);
+        }
+      } catch (error) {
+        console.error("Error fetching criteria:", error);
+      }
+    };
+
+    fetchCriteria();
+  }, []); 
 
   useEffect(() => {
     if (
@@ -160,17 +208,7 @@ const MarksInput = ({
     }
   };
 
-  if (!subjectExists || criteria.length === 0) {
-    return (
-      <Card className="w-full shadow-sm border-gray-100">
-        <CardContent className="flex items-center justify-center h-64">
-          <p className="text-gray-500">
-            No assessment criteria available for this subject.
-          </p>
-        </CardContent>
-      </Card>
-    );
-  }
+  
 
   return (
     <Card className="w-full shadow-sm border-gray-100">

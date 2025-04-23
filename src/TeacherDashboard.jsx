@@ -7,6 +7,7 @@ import { ChevronRight } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router";
 import { toast } from "react-hot-toast";
 import { Toaster } from "react-hot-toast";
+import { useStore } from "./store/useStore";
 
 const TeacherDashboard = () => {
   const [teacher, setTeacher] = useState(null);
@@ -26,7 +27,6 @@ const TeacherDashboard = () => {
     fetchExperimentData();
   }, []);
 
-  // If no subject or experiment is selected, redirect to teacher dash
   useEffect(() => {
     if (!subject && !experimentNo) {
       navigate("/teacher-dash");
@@ -66,7 +66,9 @@ const TeacherDashboard = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/api/teachers/${teacher?._id}/subjects`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/teachers/${
+          teacher?._id
+        }/subjects`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -86,6 +88,8 @@ const TeacherDashboard = () => {
     }
   }, [teacher]);
 
+  const setSubjectCriterias = useStore((state) => state.setSubjectCriterias);
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -102,6 +106,13 @@ const TeacherDashboard = () => {
         <Toaster position="top-center" />
       </div>
     );
+  }
+
+  const subjectCriterias = localStorage.getItem("subjectCriterias");
+  if (subjectCriterias) {
+    let parsedData = JSON.parse(subjectCriterias);
+    const criteriaFinal = parsedData.find((item) => item.subjectId === subject);
+    setSubjectCriterias(criteriaFinal);
   }
 
   return (

@@ -54,6 +54,8 @@ const TeacherDash = () => {
     );
   }
 
+  console.log(teacher)
+
   const handleStartEvaluation = () => {
     navigate(
       `/teacher-dashboard?exp=${teacher.batches[0].students[0].experiments[0].experimentId}&sub=${teacher.batches[0].subjects[0].name}`

@@ -195,7 +195,7 @@ const DataTableComp = ({ editMode, setEditMode, experimentNo }) => {
       }
 
       const response = await axios.post(
-        "${import.meta.env.VITE_BACKEND_URL}/api/students/update-marks",
+        `${import.meta.env.VITE_BACKEND_URL}/api/students/update-marks`,
         allChanges
       );
 
@@ -343,6 +343,7 @@ const DataTableComp = ({ editMode, setEditMode, experimentNo }) => {
           return (
             <MarksInput
               row={row}
+              currentSubject={currentSubject}
               scoringType={scoringType}
               setScoringType={setScoringType}
               sectionMarks={sectionMarks}
