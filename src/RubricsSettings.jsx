@@ -18,6 +18,7 @@ const RubricsSettings = () => {
   const { subjectId } = useParams();
   const navigate = useNavigate();
 
+  // Updated defaultCriteria - making isNull true for any criterion with marks=0
   const defaultCriteria = [
     {
       title: "Knowledge",
@@ -44,14 +45,16 @@ const RubricsSettings = () => {
       title: "Strategy (Analyse & / or Evaluate)",
       description: "(Factual/Conceptual/Procedural/Metacognitive)",
       marks: 0,
-      isNull: false,
+      isNull: true,
+      prevMarks: 5,
       order: 4,
     },
     {
       title: "Interpret / Develop",
       description: "(Factual/Conceptual/Procedural/Metacognitive)",
       marks: 0,
-      isNull: false,
+      isNull: true,
+      prevMarks: 5,
       order: 5,
     },
     {
@@ -93,11 +96,9 @@ const RubricsSettings = () => {
       ...newCriteria[index],
       isNull: checked,
       prevMarks: checked
-        ? newCriteria[index].marks
-        : newCriteria[index].prevMarks || newCriteria[index].marks,
-      marks: checked
-        ? 0
-        : newCriteria[index].prevMarks || newCriteria[index].marks,
+        ? newCriteria[index].marks || 5
+        : newCriteria[index].prevMarks || 5,
+      marks: checked ? 0 : newCriteria[index].prevMarks || 5,
     };
     setCriteria(newCriteria);
   };
@@ -129,7 +130,6 @@ const RubricsSettings = () => {
     setCourseOutcomes(newOutcomes);
   };
 
-
   useEffect(() => {
     const fetchRubrics = async () => {
       try {
@@ -148,12 +148,18 @@ const RubricsSettings = () => {
         );
 
         if (response.data && response.data.criteria) {
-          // Ensure isNull property exists on all fetched criteria
-          const fetchedCriteria = response.data.criteria.map((criterion) => ({
-            ...criterion,
-            isNull: criterion.isNull || false,
-            prevMarks: criterion.isNull ? criterion.prevMarks || 5 : undefined,
-          }));
+          // Process fetched criteria and ensure isNull is true when marks is 0
+          const fetchedCriteria = response.data.criteria.map((criterion) => {
+            const isMarksZero = criterion.marks === 0;
+            return {
+              ...criterion,
+              isNull: isMarksZero || criterion.isNull || false,
+              prevMarks:
+                isMarksZero || criterion.isNull
+                  ? criterion.prevMarks || 5
+                  : undefined,
+            };
+          });
           setCriteria(fetchedCriteria);
         }
 
@@ -184,7 +190,6 @@ const RubricsSettings = () => {
         ...criterion,
         order: index + 1,
       }));
-
 
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/rubrics`,
@@ -276,12 +281,16 @@ const RubricsSettings = () => {
                 <AccordionContent>
                   <div className="p-4 bg-gray-50 rounded-lg mt-4">
                     <p className="text-sm text-gray-500 mb-4">
-                      Specify the Course Outcome (CO) number for each experiment. This will be displayed in the rubrics PDF.
+                      Specify the Course Outcome (CO) number for each
+                      experiment. This will be displayed in the rubrics PDF.
                     </p>
                     <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                       {courseOutcomes.map((co, index) => (
                         <div key={index} className="space-y-2">
-                          <Label htmlFor={`co-${index + 1}`} className="text-sm">
+                          <Label
+                            htmlFor={`co-${index + 1}`}
+                            className="text-sm"
+                          >
                             Experiment {index + 1}
                           </Label>
                           <Input
@@ -290,7 +299,9 @@ const RubricsSettings = () => {
                             min="1"
                             max="6"
                             value={co}
-                            onChange={(e) => handleCourseOutcomeChange(index, e.target.value)}
+                            onChange={(e) =>
+                              handleCourseOutcomeChange(index, e.target.value)
+                            }
                             className="w-full"
                           />
                         </div>
@@ -312,16 +323,20 @@ const RubricsSettings = () => {
                   <div className="space-y-4">
                     <div className="p-4 bg-gray-50 rounded-lg">
                       <p className="text-sm text-gray-500">
-                        Customize the assessment criteria for student evaluations. Each
-                        criterion can have a title, description, and maximum marks. Mark
-                        criteria as "Not Applicable" if they shouldn't be included in
-                        the assessment.
+                        Customize the assessment criteria for student
+                        evaluations. Each criterion can have a title,
+                        description, and maximum marks. Mark criteria as "Not
+                        Applicable" if they shouldn't be included in the
+                        assessment.
                       </p>
                     </div>
 
                     <div className="space-y-6">
                       {criteria.map((criterion, index) => (
-                        <div key={index} className="p-4 border rounded-lg bg-gray-50">
+                        <div
+                          key={index}
+                          className="p-4 border rounded-lg bg-gray-50"
+                        >
                           <div className="flex items-start justify-between mb-4">
                             <span className="bg-gray-200 text-gray-700 text-sm font-medium px-2 py-1 rounded">
                               Criterion {index + 1}
@@ -344,7 +359,11 @@ const RubricsSettings = () => {
                                 id={`title-${index}`}
                                 value={criterion.title}
                                 onChange={(e) =>
-                                  handleCriteriaChange(index, "title", e.target.value)
+                                  handleCriteriaChange(
+                                    index,
+                                    "title",
+                                    e.target.value
+                                  )
                                 }
                                 placeholder="Enter criterion title"
                                 className="mt-1"
@@ -395,7 +414,9 @@ const RubricsSettings = () => {
                                   <Input
                                     id={`marks-${index}`}
                                     type="number"
-                                    value={criterion.isNull ? 0 : criterion.marks}
+                                    value={
+                                      criterion.isNull ? 0 : criterion.marks
+                                    }
                                     onChange={(e) =>
                                       handleCriteriaChange(
                                         index,
@@ -411,7 +432,8 @@ const RubricsSettings = () => {
                                 </div>
                                 {criterion.isNull && (
                                   <span className="text-sm text-gray-500 italic mt-6">
-                                    This criterion will not be included in assessment
+                                    This criterion will not be included in
+                                    assessment
                                   </span>
                                 )}
                               </div>
