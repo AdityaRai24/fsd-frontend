@@ -21,7 +21,7 @@ const TeacherDash = () => {
 
     try {
       const response = await axios.get(
-        `https://rubricslab.onrender.com/api/teachers/${teacherId}`,
+        `http://localhost:8000/api/teachers/${teacherId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -55,13 +55,11 @@ const TeacherDash = () => {
   }
 
   const handleStartEvaluation = () => {
-    console.log(teacher.batches[0].experiments[0]._id);
     navigate(
       `/teacher-dashboard?exp=${teacher.batches[0].students[0].experiments[0].experimentId}&sub=${teacher.batches[0].subjects[0].name}`
     );
   };
 
-  console.log(teacher);
 
   return (
     <div className="px-6 py-8">

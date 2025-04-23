@@ -45,7 +45,7 @@ const Login = () => {
       };
 
       const response = await axios.post(
-        "https://rubricslab.onrender.com/api/auth/login",
+        "http://localhost:8000/api/auth/login",
         payload
       );
 

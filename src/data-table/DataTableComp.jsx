@@ -24,7 +24,7 @@ import TablePagination from "./TablePagination";
 import useStudentData from "./useStudentData";
 import StudentRubricsModal from "@/components/StudentRubricsModal";
 import axios from "axios";
-import { Spinner } from "@/components/Spinner"; // Assuming you have a spinner component
+import { Spinner } from "@/components/spinner"; // Assuming you have a spinner component
 
 const DataTableComp = ({ editMode, setEditMode, experimentNo }) => {
   const [searchParams] = useSearchParams();
@@ -57,7 +57,7 @@ const DataTableComp = ({ editMode, setEditMode, experimentNo }) => {
     const fetchCriteria = async () => {
       try {
         const subjectResponse = await axios.get(
-          `https://rubricslab.onrender.com/api/subjects/name/${currentSubject}`,
+          `http://localhost:8000/api/subjects/name/${currentSubject}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -70,7 +70,7 @@ const DataTableComp = ({ editMode, setEditMode, experimentNo }) => {
         const subjectId = subjectResponse.data._id;
 
         const rubricsResponse = await axios.get(
-          `https://rubricslab.onrender.com/api/rubrics/${subjectId}`,
+          `http://localhost:8000/api/rubrics/${subjectId}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -187,7 +187,6 @@ const DataTableComp = ({ editMode, setEditMode, experimentNo }) => {
         .filter(Boolean);
 
       const allChanges = [...overallChanges, ...sectionChanges];
-      
 
       if (allChanges.length === 0) {
         setIsSaving(false);
@@ -196,7 +195,7 @@ const DataTableComp = ({ editMode, setEditMode, experimentNo }) => {
       }
 
       const response = await axios.post(
-        "https://rubricslab.onrender.com/api/students/update-marks",
+        "http://localhost:8000/api/students/update-marks",
         allChanges
       );
 
@@ -492,14 +491,12 @@ const DataTableComp = ({ editMode, setEditMode, experimentNo }) => {
 
       <TablePagination table={table} disabled={loading || isSaving} />
 
-      <div>
-        <StudentRubricsModal
+      <StudentRubricsModal
         subjectName={currentSubject}
         isOpen={isRubricsModalOpen}
         onClose={() => setIsRubricsModalOpen(false)}
         student={selectedStudent}
       />
-      </div>
     </div>
   );
 };

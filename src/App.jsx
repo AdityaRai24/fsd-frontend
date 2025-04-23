@@ -11,12 +11,10 @@ import { Toaster } from "react-hot-toast";
 import TeacherDash from "./TeacherDash";
 
 function App() {
-
-
   return (
     <Router>
       <Toaster position="top-center" />
-    
+
       <Routes>
         <Route path="/" element={<Login />} />
         <Route

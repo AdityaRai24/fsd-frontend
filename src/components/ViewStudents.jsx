@@ -18,14 +18,13 @@ const ViewStudents = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const subject = searchParams.get("sub");
-  
 
   useEffect(() => {
     const fetchStudents = async () => {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get(
-          `https://rubricslab.onrender.com/api/students/subject/${subject}`,
+          `http://localhost:8000/api/students/subject/${subject}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

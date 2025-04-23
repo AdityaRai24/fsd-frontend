@@ -26,6 +26,7 @@ const TeacherDashboard = () => {
     fetchExperimentData();
   }, []);
 
+  // If no subject or experiment is selected, redirect to teacher dash
   useEffect(() => {
     if (!subject && !experimentNo) {
       navigate("/teacher-dash");
@@ -38,7 +39,7 @@ const TeacherDashboard = () => {
 
     try {
       const response = await axios.get(
-        `https://rubricslab.onrender.com/api/teachers/${teacherId}`,
+        `http://localhost:8000/api/teachers/${teacherId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -55,8 +56,9 @@ const TeacherDashboard = () => {
   };
 
   const fetchExperimentData = async () => {
+    console.log(experimentNo);
     const response = await axios.get(
-      `https://rubricslab.onrender.com/api/experiments/${experimentNo}`
+      `http://localhost:8000/api/experiments/${experimentNo}`
     );
     setExperiment(response.data);
   };
@@ -65,7 +67,7 @@ const TeacherDashboard = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        `https://rubricslab.onrender.com/api/teachers/${teacher?._id}/subjects`,
+        `http://localhost:8000/api/teachers/${teacher?._id}/subjects`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -78,7 +80,6 @@ const TeacherDashboard = () => {
       toast.error("Failed to fetch subjects");
     }
   };
-
 
   useEffect(() => {
     if (teacher?._id) {

@@ -7,6 +7,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 const StudentRubricsModal = ({ isOpen, onClose, student,subjectName }) => {
   if (!student) return null;
 
+  console.log("openinnngnnng rubbrics")
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-5xl w-[90vw]">

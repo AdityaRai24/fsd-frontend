@@ -290,7 +290,7 @@ const RubricsPDF = ({ studentData, subjectName }) => {
     const fetchCriteria = async () => {
       try {
         const subjectResponse = await axios.get(
-          `https://rubricslab.onrender.com/api/subjects/name/${subjectName}`,
+          `http://localhost:8000/api/subjects/name/${subjectName}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -306,7 +306,7 @@ const RubricsPDF = ({ studentData, subjectName }) => {
         const subjectId = subjectResponse.data._id;
 
         const rubricsResponse = await axios.get(
-          `https://rubricslab.onrender.com/api/rubrics/${subjectId}`,
+          `http://localhost:8000/api/rubrics/${subjectId}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -524,7 +524,6 @@ const RubricsPDF = ({ studentData, subjectName }) => {
             </View>
           </View>
 
-          {/* Footer */}
           <View style={styles.footer}>
             <Image src={RubricsBottom} style={styles.footerImg} />
           </View>

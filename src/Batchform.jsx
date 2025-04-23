@@ -65,8 +65,8 @@ const BatchForm = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   useEffect(() => {
-    axios.get("https://rubricslab.onrender.com/api/subjects").then((res) => setSubjects(res.data));
-    axios.get("https://rubricslab.onrender.com/api/students").then((res) => {
+    axios.get("http://localhost:8000/api/subjects").then((res) => setSubjects(res.data));
+    axios.get("http://localhost:8000/api/students").then((res) => {
       setStudents(res.data);
       setFilteredStudents(res.data);
     });
