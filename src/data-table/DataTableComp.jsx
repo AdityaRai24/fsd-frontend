@@ -24,7 +24,7 @@ import TablePagination from "./TablePagination";
 import useStudentData from "./useStudentData";
 import StudentRubricsModal from "@/components/StudentRubricsModal";
 import axios from "axios";
-import { Spinner } from "@/components/spinner"; // Assuming you have a spinner component
+import { Spinner } from "@/components/Spinner"; 
 
 const DataTableComp = ({ editMode, setEditMode, experimentNo }) => {
   const [searchParams] = useSearchParams();
