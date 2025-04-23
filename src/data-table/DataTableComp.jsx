@@ -24,8 +24,9 @@ import TablePagination from "./TablePagination";
 import useStudentData from "./useStudentData";
 import StudentRubricsModal from "@/components/StudentRubricsModal";
 import axios from "axios";
-import { Spinner } from "@/components/Spinner"; 
+import { Spinner } from "@/components/Spinner";
 import toast from "react-hot-toast";
+import { useStore } from "@/store/useStore";
 
 const DataTableComp = ({ editMode, setEditMode, experimentNo }) => {
   const [searchParams] = useSearchParams();
@@ -41,6 +42,10 @@ const DataTableComp = ({ editMode, setEditMode, experimentNo }) => {
   const [criteria, setCriteria] = useState([]);
 
   const currentSubject = searchParams.get("sub") || "DevOps";
+  const subjectCriterias = useStore((state) => state.subjectCriterias);
+  const subjectExists = subjectCriterias.some(
+    (subject) => subject.subjectId === currentSubject
+  );
 
   const {
     loading,
@@ -53,12 +58,13 @@ const DataTableComp = ({ editMode, setEditMode, experimentNo }) => {
     setCustomMarks,
   } = useStudentData(currentSubject, experimentNo);
 
-
   useEffect(() => {
     const fetchCriteria = async () => {
       try {
         const subjectResponse = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/api/subjects/name/${currentSubject}`,
+          `${
+            import.meta.env.VITE_BACKEND_URL
+          }/api/subjects/name/${currentSubject}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -79,7 +85,10 @@ const DataTableComp = ({ editMode, setEditMode, experimentNo }) => {
           }
         );
 
-        if (rubricsResponse.data?.criteria && rubricsResponse.data.criteria.length > 0) {
+        if (
+          rubricsResponse.data?.criteria &&
+          rubricsResponse.data.criteria.length > 0
+        ) {
           setCriteria(rubricsResponse.data.criteria);
         } else {
           setCriteria([
@@ -208,7 +217,6 @@ const DataTableComp = ({ editMode, setEditMode, experimentNo }) => {
             ...student,
             totalMarks: change.totalMarks || change.newMarks,
           };
-
         }
         return student;
       });
@@ -226,12 +234,14 @@ const DataTableComp = ({ editMode, setEditMode, experimentNo }) => {
   };
 
   const distributeMarks = (totalMarks) => {
-
     totalMarks = Math.round(Number(totalMarks));
 
     const marks = new Array(criteria.length).fill(0);
 
-    const totalMaxMarks = criteria.reduce((sum, criterion) => sum + (criterion.marks || 0), 0);
+    const totalMaxMarks = criteria.reduce(
+      (sum, criterion) => sum + (criterion.marks || 0),
+      0
+    );
 
     if (totalMaxMarks === 0 || criteria.length === 0) {
       return marks;
@@ -241,11 +251,9 @@ const DataTableComp = ({ editMode, setEditMode, experimentNo }) => {
       if (criterion.marks === 0) {
         marks[index] = 0;
       } else {
-        const proportionalMarks = (totalMarks * criterion.marks) / totalMaxMarks;
-        marks[index] = Math.min(
-          Math.round(proportionalMarks),
-          criterion.marks
-        );
+        const proportionalMarks =
+          (totalMarks * criterion.marks) / totalMaxMarks;
+        marks[index] = Math.min(Math.round(proportionalMarks), criterion.marks);
       }
     });
 
@@ -264,15 +272,23 @@ const DataTableComp = ({ editMode, setEditMode, experimentNo }) => {
           difference++;
         }
       }
-      if (difference !== 0 && marks.every((mark, i) => 
-        mark === (difference > 0 ? criteria[i].marks : 0)
-      )) break;
+      if (
+        difference !== 0 &&
+        marks.every(
+          (mark, i) => mark === (difference > 0 ? criteria[i].marks : 0)
+        )
+      )
+        break;
     }
 
     return marks;
   };
 
   const handleViewRubrics = (student) => {
+    if (!subjectExists) {
+      toast.error("No rubrics found for this subject");
+      return;
+    }
     setSelectedStudent(student);
     setIsRubricsModalOpen(true);
   };
@@ -395,7 +411,7 @@ const DataTableComp = ({ editMode, setEditMode, experimentNo }) => {
   }
 
   if (error) {
-    console.log(error)
+    console.log(error);
     return (
       <div className="max-w-[80%] mx-auto p-4 border border-red-200 rounded-md bg-red-50 text-center my-4">
         <p className="text-red-500">
@@ -410,7 +426,6 @@ const DataTableComp = ({ editMode, setEditMode, experimentNo }) => {
       </div>
     );
   }
-
 
   return (
     <div className="max-w-[80%] mx-auto relative">

@@ -34,6 +34,7 @@ const StudentRubricsModal = ({
       toast.error("No rubrics found for this subject");
     }
   }, [subjectExists, isOpen]);
+  
 
   if (!student || !subjectExists) return null;
 

@@ -107,28 +107,6 @@ const TeacherDashboard = () => {
   };
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   const fetchTeacherData = async () => {
     const teacherId = localStorage.getItem("teacherId");
     const token = localStorage.getItem("token");
