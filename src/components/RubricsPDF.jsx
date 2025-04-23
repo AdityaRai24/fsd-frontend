@@ -235,8 +235,6 @@ const styles = StyleSheet.create({
 
 const RubricsPDF = ({ studentData, subjectName }) => {
 
-
-
   const defaultCriteria = [
     {
       title: "Knowledge",
@@ -259,13 +257,13 @@ const RubricsPDF = ({ studentData, subjectName }) => {
     {
       title: "Strategy (Analyse & / or Evaluate)",
       description: "(Factual/Conceptual/Procedural/Metacognitive)",
-      marks: 5,
+      marks: 0,
       order: 4,
     },
     {
       title: "Interpret / Develop",
       description: "(Factual/Conceptual/Procedural/Metacognitive)",
-      marks: 5,
+      marks: 0,
       order: 5,
     },
     {
@@ -286,12 +284,14 @@ const RubricsPDF = ({ studentData, subjectName }) => {
   ];
 
   const [criteria, setCriteria] = useState(defaultCriteria);
+  const [criteriaType, setCriteriaType] = useState("default");
   const [courseOutcomes, setCourseOutcomes] = useState(Array(10).fill(1));
+
 
   useEffect(() => {
     const fetchCriteria = async () => {
 
-      if (typeof window === "undefined") return; // Prevent SSR crash
+      if (typeof window === "undefined") return; 
 
       try {
         const subjectResponse = await axios.get(
@@ -324,6 +324,7 @@ const RubricsPDF = ({ studentData, subjectName }) => {
           rubricsResponse.data.criteria.length > 0
         ) {
           setCriteria(rubricsResponse.data.criteria);
+          setCriteriaType("custom")
         } else {
           console.log("8. No custom criteria found, using defaults");
           setCriteria(defaultCriteria);
@@ -333,6 +334,7 @@ const RubricsPDF = ({ studentData, subjectName }) => {
           setCourseOutcomes(rubricsResponse.data.courseOutcomes);
         }
       } catch (error) {
+        console.log("setting default criteria",error)
         setCriteria(defaultCriteria);
       }
     };
@@ -341,6 +343,8 @@ const RubricsPDF = ({ studentData, subjectName }) => {
   }, [studentData?.subjectName]);
 
   if (!studentData) return <div>Loading...</div>;
+
+  console.log({criteria,criteriaType})
 
 
   const rowData = (criteria || defaultCriteria).map((criterion, index) => ({
@@ -354,7 +358,6 @@ const RubricsPDF = ({ studentData, subjectName }) => {
 
     const { title, smallText, marks } = rowInfo;
     const criterionMarks = criteria[rowIndex]?.marks || 0;
-
 
     return (
       <View style={styles.tableRow} key={rowIndex}>
