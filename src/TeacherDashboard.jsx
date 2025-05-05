@@ -117,7 +117,7 @@ const TeacherDashboard = () => {
 
     try {
       const response = await axios.get(
-        `http://localhost:8000/api/teachers/${teacherId}`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/teachers/${teacherId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -136,7 +136,7 @@ const TeacherDashboard = () => {
   const fetchExperimentData = async () => {
     console.log(experimentNo);
     const response = await axios.get(
-      `http://localhost:8000/api/experiments/${experimentNo}`
+      `${import.meta.env.VITE_BACKEND_URL}/api/experiments/${experimentNo}`
     );
     setExperiment(response.data);
   };
@@ -145,7 +145,7 @@ const TeacherDashboard = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        `http://localhost:8000/api/teachers/${teacher?._id}/subjects`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/teachers/${teacher?._id}/subjects`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
