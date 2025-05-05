@@ -24,6 +24,7 @@ const StudentRubricsModal = ({
   const [activeTab, setActiveTab] = useState("view");
 
   const subjectCriterias = useStore((state) => state.subjectCriterias);
+  const courseCodeOutcomes = useStore((state) => state.courseCodeOutcomes);
 
   const subjectExists = subjectCriterias.some(
     (subject) => subject.subjectId === subjectName
@@ -44,7 +45,9 @@ const StudentRubricsModal = ({
 
   const subjectFinalCriteria = subjec.subjectCriteria;
   const subjectFinalCO = subjec.courseOutcomes;
-  const finalBloom = subjec.courseCodeOutcomes;
+  const finalBloom = courseCodeOutcomes.find(
+    (subject) => subject.subjectId === subjectName
+  )?.outcomes || [];
     let downloadAvailable = false;
 
   if (student?.allExperimentMarks) {

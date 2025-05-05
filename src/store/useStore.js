@@ -3,6 +3,7 @@ import { create } from "zustand";
 export const useStore = create((set) => ({
   subjectCriterias: [],
   teacherData: null,
+  courseCodeOutcomes: [],
 
   setSubjectCriterias: (newCriteria) =>
     set((state) => {
@@ -23,4 +24,22 @@ export const useStore = create((set) => ({
     }),
 
   setTeacherData: (teacherData) => set({ teacherData }),
+
+  setCourseCodeOutcomes: (newOutcomes) =>
+    set((state) => {
+      const exists = state.courseCodeOutcomes.find(
+        (item) => item.subjectId === newOutcomes.subjectId
+      );
+
+      let updatedList;
+      if (exists) {
+        updatedList = state.courseCodeOutcomes.map((item) =>
+          item.subjectId === newOutcomes.subjectId ? newOutcomes : item
+        );
+      } else {
+        updatedList = [...state.courseCodeOutcomes, newOutcomes];
+      }
+
+      return { courseCodeOutcomes: updatedList };
+    }),
 }));

@@ -18,6 +18,8 @@ import { useStore } from "./store/useStore";
 const RubricsSettings = () => {
   const { subjectId } = useParams();
   const navigate = useNavigate();
+  const setSubjectCriterias = useStore((state) => state.setSubjectCriterias);
+  const setCourseCodeOutcomes = useStore((state) => state.setCourseCodeOutcomes);
 
   const defaultCriteria = [
     {
@@ -81,11 +83,10 @@ const RubricsSettings = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [courseOutcomes, setCourseOutcomes] = useState(Array(10).fill(1));
-  const [courseCodeOutcomes, setCourseCodeOutcomes] = useState([
+  const [courseCodeOutcomes, setLocalCourseCodeOutcomes] = useState([
     { code: "DJS22ITL502.1", outcome: "Carry out amortized Analysis of algorithms." },
     { code: "DJS22ITL502.2", outcome: "Solve a problem using appropriate data structure." }
   ]);
-  const setSubjectCriterias = useStore((state) => state.setSubjectCriterias);
 
   const handleCriteriaChange = (index, field, value) => {
     const newCriteria = [...criteria];
@@ -137,11 +138,11 @@ const RubricsSettings = () => {
   const handleCourseCodeOutcomeChange = (index, field, value) => {
     const newCodeOutcomes = [...courseCodeOutcomes];
     newCodeOutcomes[index] = { ...newCodeOutcomes[index], [field]: value };
-    setCourseCodeOutcomes(newCodeOutcomes);
+    setLocalCourseCodeOutcomes(newCodeOutcomes);
   };
 
   const addCourseCodeOutcome = () => {
-    setCourseCodeOutcomes([
+    setLocalCourseCodeOutcomes([
       ...courseCodeOutcomes,
       { code: "", outcome: "" }
     ]);
@@ -150,7 +151,7 @@ const RubricsSettings = () => {
   const removeCourseCodeOutcome = (index) => {
     if (courseCodeOutcomes.length > 1) {
       const newCodeOutcomes = courseCodeOutcomes.filter((_, i) => i !== index);
-      setCourseCodeOutcomes(newCodeOutcomes);
+      setLocalCourseCodeOutcomes(newCodeOutcomes);
     }
   };
 
@@ -192,7 +193,7 @@ const RubricsSettings = () => {
         }
 
         if (response.data?.courseCodeOutcomes) {
-          setCourseCodeOutcomes(response.data.courseCodeOutcomes);
+          setLocalCourseCodeOutcomes(response.data.courseCodeOutcomes);
         } else {
           // Load from localStorage if available
           const storedData = localStorage.getItem("courseCodeOutcomes");
@@ -200,7 +201,7 @@ const RubricsSettings = () => {
             try {
               const parsedData = JSON.parse(storedData);
               if (parsedData[subjectId]) {
-                setCourseCodeOutcomes(parsedData[subjectId]);
+                setLocalCourseCodeOutcomes(parsedData[subjectId]);
               }
             } catch (e) {
               console.error("Error parsing stored course code outcomes:", e);
@@ -239,7 +240,11 @@ const RubricsSettings = () => {
         subjectId: subjectName,
         subjectCriteria: orderedCriteria,
         courseOutcomes: courseOutcomes2,
-        courseCodeOutcomes: courseCodeOutcomes,
+      });
+
+      setCourseCodeOutcomes({
+        subjectId: subjectName,
+        outcomes: courseCodeOutcomes,
       });
 
       // Save criteria to localStorage
@@ -252,7 +257,6 @@ const RubricsSettings = () => {
               ...obj,
               subjectCriteria: orderedCriteria,
               courseOutcomes: courseOutcomes2,
-              courseCodeOutcomes: courseCodeOutcomes,
             };
           }
           return obj;
@@ -264,7 +268,6 @@ const RubricsSettings = () => {
             subjectId: subjectName,
             subjectCriteria: orderedCriteria,
             courseOutcomes: courseOutcomes2,
-            courseCodeOutcomes: courseCodeOutcomes,
           },
         ];
         localStorage.setItem("subjectCriterias", JSON.stringify(newArray));

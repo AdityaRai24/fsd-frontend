@@ -23,6 +23,7 @@ const TeacherDashboard = () => {
   const navigate = useNavigate();
   const subjectCriterias = useStore((state) => state.subjectCriterias);
   const setSubjectCriterias = useStore((state) => state.setSubjectCriterias);
+  const setCourseCodeOutcomes = useStore((state) => state.setCourseCodeOutcomes);
   const [newLoading, setNewLoading] = useState(false);
 
   useEffect(() => {
@@ -38,6 +39,16 @@ const TeacherDashboard = () => {
       const currentCriteria = storedData.find((item)=> item.subjectId === subject);
       if(currentCriteria){
         setSubjectCriterias(currentCriteria);
+      }
+    }
+
+    if(localStorage.getItem("courseCodeOutcomes")){
+      const storedData = JSON.parse(localStorage.getItem("courseCodeOutcomes"));
+      if(storedData[subject]){
+        setCourseCodeOutcomes({
+          subjectId: subject,
+          outcomes: storedData[subject]
+        });
       }
     }
   };
