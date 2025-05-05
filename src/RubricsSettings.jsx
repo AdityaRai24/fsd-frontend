@@ -81,6 +81,10 @@ const RubricsSettings = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [courseOutcomes, setCourseOutcomes] = useState(Array(10).fill(1));
+  const [courseCodeOutcomes, setCourseCodeOutcomes] = useState([
+    { code: "DJS22ITL502.1", outcome: "Carry out amortized Analysis of algorithms." },
+    { code: "DJS22ITL502.2", outcome: "Solve a problem using appropriate data structure." }
+  ]);
   const setSubjectCriterias = useStore((state) => state.setSubjectCriterias);
 
   const handleCriteriaChange = (index, field, value) => {
@@ -129,6 +133,27 @@ const RubricsSettings = () => {
     setCourseOutcomes(newOutcomes);
   };
 
+  // Handle course code outcomes
+  const handleCourseCodeOutcomeChange = (index, field, value) => {
+    const newCodeOutcomes = [...courseCodeOutcomes];
+    newCodeOutcomes[index] = { ...newCodeOutcomes[index], [field]: value };
+    setCourseCodeOutcomes(newCodeOutcomes);
+  };
+
+  const addCourseCodeOutcome = () => {
+    setCourseCodeOutcomes([
+      ...courseCodeOutcomes,
+      { code: "", outcome: "" }
+    ]);
+  };
+
+  const removeCourseCodeOutcome = (index) => {
+    if (courseCodeOutcomes.length > 1) {
+      const newCodeOutcomes = courseCodeOutcomes.filter((_, i) => i !== index);
+      setCourseCodeOutcomes(newCodeOutcomes);
+    }
+  };
+
   useEffect(() => {
     const fetchRubrics = async () => {
       try {
@@ -165,6 +190,23 @@ const RubricsSettings = () => {
         if (response.data?.courseOutcomes) {
           setCourseOutcomes(response.data.courseOutcomes);
         }
+
+        if (response.data?.courseCodeOutcomes) {
+          setCourseCodeOutcomes(response.data.courseCodeOutcomes);
+        } else {
+          // Load from localStorage if available
+          const storedData = localStorage.getItem("courseCodeOutcomes");
+          if (storedData) {
+            try {
+              const parsedData = JSON.parse(storedData);
+              if (parsedData[subjectId]) {
+                setCourseCodeOutcomes(parsedData[subjectId]);
+              }
+            } catch (e) {
+              console.error("Error parsing stored course code outcomes:", e);
+            }
+          }
+        }
       } catch (error) {
         console.error("Failed to fetch rubrics:", error);
         setError("Failed to fetch rubrics settings");
@@ -197,17 +239,20 @@ const RubricsSettings = () => {
         subjectId: subjectName,
         subjectCriteria: orderedCriteria,
         courseOutcomes: courseOutcomes2,
+        courseCodeOutcomes: courseCodeOutcomes,
       });
 
+      // Save criteria to localStorage
       const storedData = localStorage.getItem("subjectCriterias");
       if (storedData) {
-        let dataArray = JSON.parse(storedData)
+        let dataArray = JSON.parse(storedData);
         const editedArray = dataArray?.map((obj) => {
           if (obj.id === "subjectId") {
             return {
               ...obj,
               subjectCriteria: orderedCriteria,
               courseOutcomes: courseOutcomes2,
+              courseCodeOutcomes: courseCodeOutcomes,
             };
           }
           return obj;
@@ -219,10 +264,17 @@ const RubricsSettings = () => {
             subjectId: subjectName,
             subjectCriteria: orderedCriteria,
             courseOutcomes: courseOutcomes2,
+            courseCodeOutcomes: courseCodeOutcomes,
           },
         ];
         localStorage.setItem("subjectCriterias", JSON.stringify(newArray));
       }
+
+      // Save course code outcomes to localStorage
+      const codeOutcomesData = localStorage.getItem("courseCodeOutcomes");
+      let codeOutcomesObj = codeOutcomesData ? JSON.parse(codeOutcomesData) : {};
+      codeOutcomesObj[subjectId] = courseCodeOutcomes;
+      localStorage.setItem("courseCodeOutcomes", JSON.stringify(codeOutcomesObj));
 
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/rubrics`,
@@ -230,6 +282,7 @@ const RubricsSettings = () => {
           subject: subjectId,
           criteria: orderedCriteria,
           courseOutcomes: courseOutcomes2,
+          courseCodeOutcomes: courseCodeOutcomes,
         },
         {
           headers: {
@@ -238,7 +291,7 @@ const RubricsSettings = () => {
         }
       );
 
-      setSuccess("Rubrics criteria updated successfully!");
+      setSuccess("Rubrics criteria and course outcomes updated successfully!");
     } catch (err) {
       const errorMessage =
         err.response?.data?.message ||
@@ -306,6 +359,86 @@ const RubricsSettings = () => {
         <div className="bg-white rounded-lg shadow">
           <div className="p-6">
             <Accordion type="multiple" className="space-y-4">
+              {/* Course Code and Outcomes Section */}
+              <AccordionItem value="course-code-outcomes">
+                <AccordionTrigger className="text-lg font-medium text-gray-900 hover:no-underline">
+                  Course Codes and Outcomes
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="p-4 bg-gray-50 rounded-lg mt-4">
+                    <p className="text-sm text-gray-500 mb-4">
+                      Manage course codes and their associated outcomes. These will be displayed in reports and PDFs.
+                    </p>
+                    
+                    <div className="space-y-4">
+                      {courseCodeOutcomes.map((item, index) => (
+                        <div key={index} className="p-4 border rounded-lg bg-white">
+                          <div className="flex items-start justify-between mb-4">
+                            <span className="bg-gray-200 text-gray-700 text-sm font-medium px-2 py-1 rounded">
+                              Course Outcome {index + 1}
+                            </span>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeCourseCodeOutcome(index)}
+                              disabled={courseCodeOutcomes.length === 1}
+                              className="text-red-500 hover:text-red-700"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+
+                          <div className="grid gap-4">
+                            <div>
+                              <Label htmlFor={`code-${index}`}>Course Code</Label>
+                              <Input
+                                id={`code-${index}`}
+                                value={item.code}
+                                onChange={(e) =>
+                                  handleCourseCodeOutcomeChange(
+                                    index,
+                                    "code",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder="Enter course code (e.g., DJS22ITL502.1)"
+                                className="mt-1"
+                              />
+                            </div>
+
+                            <div>
+                              <Label htmlFor={`outcome-${index}`}>Course Outcome</Label>
+                              <Textarea
+                                id={`outcome-${index}`}
+                                value={item.outcome}
+                                onChange={(e) =>
+                                  handleCourseCodeOutcomeChange(
+                                    index,
+                                    "outcome",
+                                    e.target.value
+                                  )
+                                }
+                                placeholder="Enter course outcome description"
+                                className="mt-1"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+
+                      <Button
+                        onClick={addCourseCodeOutcome}
+                        variant="outline"
+                        className="w-full"
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add New Course Outcome
+                      </Button>
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
               {/* Course Outcomes Section */}
               <AccordionItem value="course-outcomes">
                 <AccordionTrigger className="text-lg font-medium text-gray-900 hover:no-underline">

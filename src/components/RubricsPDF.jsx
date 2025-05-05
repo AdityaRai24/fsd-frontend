@@ -9,6 +9,7 @@ import {
 } from "@react-pdf/renderer";
 import RubricsTop from "@/assets/rubrics_top.png";
 import RubricsBottom from "@/assets/rubrics_bottom.png";
+import BloomFilter from "@/assets/bloomfilter.png";
 
 const styles = StyleSheet.create({
   page: {
@@ -30,6 +31,10 @@ const styles = StyleSheet.create({
     maxWidth: "80%",
     margin: "0 auto",
   },
+  headerImg2: {
+    maxWidth: "100%",
+    margin: "0 auto",
+  },
   headerLogo: {
     width: 60,
     height: 60,
@@ -48,6 +53,12 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 11,
     textAlign: "center",
+    marginBottom: 2,
+  },
+  departmentTitle2: {
+    fontWeight: "bold",
+    fontSize: 14,
+    textAlign: "left",
     marginBottom: 2,
   },
   assessmentTitle: {
@@ -226,11 +237,40 @@ const styles = StyleSheet.create({
   footer: {
     marginTop: 40,
   },
+
+  table2: {
+    display: 'table',
+    width: 'auto',
+    marginBottom: 10,
+  },
+  tableRow2: {
+    flexDirection: 'row',
+  },
+  tableHeaderCell2: {
+    fontWeight: 'bold',
+    padding: 5,
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderColor: '#000',
+    textAlign: 'center',
+  },
+  tableCell2: {
+    padding: 5,
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderColor: '#000',
+  },
+  codeColumn2: {
+    width: '25%',
+  },
+  outcomeColumn2: {
+    width: '75%',
+  },
+
+
 });
 
-const RubricsPDF = ({ finalCO, finalCriterias, studentData, subjectName }) => {
-
-  console.log(studentData)
+const RubricsPDF = ({ finalCO, finalCriterias,finalBloom, studentData, subjectName }) => {
 
   if (!studentData) {
     return (
@@ -243,6 +283,9 @@ const RubricsPDF = ({ finalCO, finalCriterias, studentData, subjectName }) => {
       </Document>
     );
   }
+
+  console.log({finalCO, finalCriterias,finalBloom, studentData, subjectName });
+
 
   return (
     <Document>
@@ -422,6 +465,54 @@ const RubricsPDF = ({ finalCO, finalCriterias, studentData, subjectName }) => {
 
           <View style={styles.footer}>
             <Image src={RubricsBottom} style={styles.footerImg} />
+          </View>
+        </View>
+      </Page>
+      <Page size="A4" style={styles.page}>
+        <View style={styles.pageBorder}>
+          <View style={styles.header}>
+            <Image src={RubricsTop} style={styles.headerImg} />
+          </View>
+          <View>
+            <Text style={styles.departmentTitle}>
+              DEPARTMENT OF INFORMATION TECHNOLOGY
+            </Text>
+            <Text style={styles.departmentTitle}>
+              Bloom’s (Revised) Taxonomy
+            </Text>
+          </View>
+          <View style={styles.header}>
+            <Image src={BloomFilter} style={styles.headerImg2} />
+          </View>
+
+          <View>
+            <Text style={styles.departmentTitle2}>Course : {subjectName}</Text>
+
+            <View style={styles.table2}>
+              {/* Table Header */}
+              <View style={[styles.tableRow2,{marginTop:10}]}>
+                <View style={[styles.tableHeaderCell2, styles.codeColumn2]}>
+                  <Text style={{ fontSize: "14px", textAlign: "center" }}>Code</Text>
+                </View>
+                <View style={[styles.tableHeaderCell2, styles.outcomeColumn2]}>
+                  <Text style={{ fontSize: "14px", textAlign: "center" }}>Course Outcome</Text>
+                </View>
+              </View>
+
+              {/* Table Rows */}
+              {finalBloom.map((item)=>{
+                return(
+                  <View key={item.code} style={styles.tableRow2}>
+                  <View style={[styles.tableCell2, styles.codeColumn2]}>
+                    <Text style={{ fontSize: "14px", textAlign: "left" }}>{item.code}</Text>
+                  </View>
+                  <View style={[styles.tableCell2, styles.outcomeColumn2]}>
+                    <Text style={{ fontSize: "14px", textAlign: "left" }}>{item.outcome}</Text>
+                  </View>
+                </View>
+                )
+              })}
+            </View>
           </View>
         </View>
       </Page>

@@ -14,6 +14,7 @@ const SubjectRubrics = () => {
   const [rubricsData, setRubricsData] = useState(null);
   const [criteriaDetails, setCriteriaDetails] = useState(null);
   const [CODetails, setCODetails] = useState(null);
+  const [finalBloom, setFinalBloom] = useState(null);
 
   useEffect(() => {
     fetchRubricsDetails();
@@ -49,6 +50,7 @@ const SubjectRubrics = () => {
         `${import.meta.env.VITE_BACKEND_URL}/api/rubrics/${subjectId}`
       );
       setCriteriaDetails(response.data.criteria);
+      setFinalBloom(response.data.courseCodeOutcomes);
       setCODetails(response.data.courseOutcomes);
     } catch (error) {
       console.log(error);
@@ -68,14 +70,18 @@ const SubjectRubrics = () => {
     );
   }
 
+  console.log(rubricsData);
+
   const handleDownloadView = () => {
     let downloadAvailable = false;
 
     if (rubricsData?.allExperimentMarks) {
-      downloadAvailable = rubricsData?.allExperimentMarks.every((experiment) => {
-        const sum = experiment.reduce((total, mark) => total + mark, 0);
-        return sum > 0;
-      });
+      downloadAvailable = rubricsData?.allExperimentMarks.every(
+        (experiment) => {
+          const sum = experiment.reduce((total, mark) => total + mark, 0);
+          return sum > 0;
+        }
+      );
     }
 
     if (downloadAvailable) {
@@ -132,6 +138,7 @@ const SubjectRubrics = () => {
             className="border-0"
           >
             <RubricsPDF
+              finalBloom={finalBloom}
               finalCriterias={criteriaDetails}
               finalCO={CODetails}
               studentData={rubricsData}

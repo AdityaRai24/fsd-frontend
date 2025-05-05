@@ -44,7 +44,7 @@ const StudentRubricsModal = ({
 
   const subjectFinalCriteria = subjec.subjectCriteria;
   const subjectFinalCO = subjec.courseOutcomes;
-
+  const finalBloom = subjec.courseCodeOutcomes;
     let downloadAvailable = false;
 
   if (student?.allExperimentMarks) {
@@ -98,6 +98,7 @@ const StudentRubricsModal = ({
                     subjectName={subjectName}
                     experimentNo={experimentNo}
                     studentData={student}
+                    finalBloom={finalBloom}
                   />
                 }
                 fileName={`rubrics-${student.rollNo}-${student.studentName
@@ -127,6 +128,7 @@ const StudentRubricsModal = ({
                   finalCriterias={subjectFinalCriteria}
                   subjectName={subjectName}
                   experimentNo={experimentNo}
+                  finalBloom={finalBloom}
                   studentData={student}
                 />
               </PDFViewer>
